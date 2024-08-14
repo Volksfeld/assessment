@@ -1,19 +1,25 @@
-# Welcome to your Expo app 👋
+# Yopaki Recruiting
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Thank you again for participating in this recruiting process.
+
+Please, follow the instructions and submit your results when ready.
+
+NOTE: This is not a leet code exercise nor a trick question exam.
+This is authentically a way to look into each other's minds regarding how we can
+collaborate.
 
 ## Get started
 
 1. Install dependencies
 
    ```bash
-   npm install
+   pnpm install
    ```
 
 2. Start the app
 
    ```bash
-    npx expo start
+    pnpm expo start
    ```
 
 In the output, you'll find options to open the app in a
@@ -24,27 +30,28 @@ In the output, you'll find options to open the app in a
 - [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
 
 You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+ a blank **app** directory where you can start developing.
 
-## Get a fresh project
+# Goals
+The current app shows a nice animated carousel. This carousel was obtained from
+our collections of resources, ie copy-pasted.
 
-When you're ready, run:
+We noticed it has a drawback: it's capped to 4 elements.
+I say 'capped' because if you add more, the collapsed cards get very thin.
 
-```bash
-npm run reset-project
-```
+Your challenges are there:
+1. Don't change the package manager: npm is slow and yarn the worst cancer in mobile dev — I'm willing to die on this hill.
+2. Make the carousel suitable for more elements.
+   1. 4-ish should be displayed at a time but if you scroll left or right you should be able to see the rest.
+3. When you double tap a card, the user should be taken to a screen where the card picture is shown along with some more details (lorem ipsum)
+4. Remove the dummy data `_data` and use the functions provided in the file `/lib/data.ts`. DO NOT modify this file.
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Restrictions:
+1. You may install any dependency you want.
+   1. If it is not an expo package or react query you should be prepared to justify it (one sentence, not an essay)
+2. The data functions are throttled on purpose to see how you would handle cache.
+   1. You're free to handle this in whichever way you see fit.
+   2. This will be a point of discussion — not an inquisition, there's no right or wrong here, only trade-offs.
 
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Submit as a GitHub repo where you invite the user `carloschida`.
+If at any point you have questions, contact me `carlos@yopaki.com`.
