@@ -5,18 +5,19 @@ import {
   Pressable,
   StatusBar,
   StyleSheet,
+  TouchableOpacity,
   View,
 } from "react-native";
 
 import Constants from "expo-constants";
-import { MotiView } from "moti";
+import { MotiView, ScrollView } from "moti";
 import Animated, {
   Easing,
   FadeInRight,
   FadeOutLeft,
 } from "react-native-reanimated";
+import { LocationModel } from "./common/domain/models";
 
-const { width } = Dimensions.get("window");
 
 const _data = [
   {
@@ -86,8 +87,44 @@ const _data = [
 
 const _spacing = 12;
 
+const { width } = Dimensions.get("window");
+
+const _closedLocationWidth = width * 0.10;
+const _openLocationWidth = width * 0.55;
+
 export default function App() {
   const [selectedItem, setSelectedItem] = React.useState(0);
+
+  type ItemType = {
+    item: LocationModel;
+  }
+
+  function SelectedItem({ item }: ItemType) {
+    return (
+      <Animated.View
+        style={{
+          marginLeft: 50 + _spacing,
+          position: "absolute",
+        }}
+      >
+        <Animated.Text
+          style={{ color: item.color, fontWeight: "bold" }}
+          entering={FadeInRight.delay(50)}
+          exiting={FadeOutLeft.delay(100)}
+        >
+          {item.location}
+        </Animated.Text>
+        <Animated.Text
+          style={{ color: item.color, fontWeight: "bold" }}
+          entering={FadeInRight.delay(100)}
+          exiting={FadeOutLeft.delay(50)}
+        >
+          {item.location}
+        </Animated.Text>
+      </Animated.View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <StatusBar hidden />
@@ -98,92 +135,74 @@ export default function App() {
           height: width,
         }}
       >
-        {_data.slice(0, 4).map((item, index) => {
-          return (
-            <MotiView
-              key={item.key}
-              animate={{
-                flex: selectedItem === index ? _data.length - 1 : 1,
-              }}
-              transition={{
-                type: "timing",
-                duration: 500,
-                easing: Easing.inOut(Easing.ease),
-              }}
-              style={{
-                borderRadius: _spacing * 2,
-                overflow: "hidden",
-                marginRight: index === _data.length - 1 ? 0 : _spacing,
-              }}
-            >
-              <Pressable
-                style={{
-                  flex: 1,
-                  justifyContent: "flex-end",
-                  padding: _spacing / 2,
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          {_data.map((item, index) => {
+            return (
+              <MotiView
+                key={item.key}
+                animate={{
+                  flex: selectedItem === index ? _data.length - 1 : 1,
+                  width: selectedItem === index ? _openLocationWidth : _closedLocationWidth,
                 }}
-                onPress={() => {
-                  setSelectedItem(index);
+                transition={{
+                  type: "timing",
+                  duration: 500,
+                  easing: Easing.inOut(Easing.ease),
+                }}
+                style={{
+                  borderRadius: _spacing * 2,
+                  overflow: "hidden",
+                  marginRight: index === _data.length - 1 ? 0 : _spacing,
                 }}
               >
-                <Image
-                  source={{ uri: item.image }}
-                  style={[
-                    StyleSheet.absoluteFillObject,
-                    { resizeMode: "cover" },
-                  ]}
-                />
-                <Animated.View
+                <TouchableOpacity
                   style={{
-                    flexDirection: "row",
-                    alignItems: "center",
+                    flex: 1,
+                    justifyContent: "flex-end",
+                    padding: _spacing / 2,
+                  }}
+
+                  onPress={() => {
+                    setSelectedItem(index);
                   }}
                 >
-                  <MotiView
-                    animate={{
-                      backgroundColor:
-                        selectedItem === index ? item.color : "#fff",
-                    }}
-                    transition={{
-                      type: "timing",
-                      duration: 1000,
-                    }}
-                    style={{
-                      width: "100%",
-                      maxWidth: 50,
-                      maxHeight: 50,
-                      aspectRatio: 1,
-                      borderRadius: 100,
-                    }}
+                  <Image
+                    source={{ uri: item.image }}
+                    style={[
+                      StyleSheet.absoluteFillObject,
+                      { resizeMode: "cover" },
+                    ]}
                   />
-                  {selectedItem === index && (
-                    <Animated.View
-                      style={{
-                        marginLeft: 50 + _spacing,
-                        position: "absolute",
+                  <Animated.View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                    }}
+                  >
+                    <MotiView
+                      animate={{
+                        backgroundColor:
+                          selectedItem === index ? item.color : "#fff",
                       }}
-                    >
-                      <Animated.Text
-                        style={{ color: item.color, fontWeight: "bold" }}
-                        entering={FadeInRight.delay(50)}
-                        exiting={FadeOutLeft.delay(100)}
-                      >
-                        {item.location}
-                      </Animated.Text>
-                      <Animated.Text
-                        style={{ color: item.color, fontWeight: "bold" }}
-                        entering={FadeInRight.delay(100)}
-                        exiting={FadeOutLeft.delay(50)}
-                      >
-                        {item.location}
-                      </Animated.Text>
-                    </Animated.View>
-                  )}
-                </Animated.View>
-              </Pressable>
-            </MotiView>
-          );
-        })}
+                      transition={{
+                        type: "timing",
+                        duration: 1000,
+                      }}
+                      style={{
+                        width: "100%",
+                        maxWidth: 50,
+                        maxHeight: 50,
+                        aspectRatio: 1,
+                        borderRadius: 100,
+                      }}
+                    />
+                    {selectedItem === index && <SelectedItem item={item} />}
+                  </Animated.View>
+                </TouchableOpacity>
+              </MotiView>
+            );
+          })}
+        </ScrollView>
       </View>
     </View>
   );
