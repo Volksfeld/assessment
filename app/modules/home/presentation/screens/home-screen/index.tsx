@@ -132,6 +132,10 @@ const HomeScreen: React.FC = () => {
                 <TouchableOpacity
                   style={styles.destinationButton}
                   onPress={() => {
+                    // Thinking about "3. When you double tap a card, the user should be taken to a screen where the card picture is shown along with some more details (lorem ipsum)".
+                    // Should I have considered that a double tap is when you click on a "selected item" or not?
+                    // If so, could have checked if selectedItem === index and then navigate to the screen. Would be easier and beatiful, but I felt like complicating things.
+                    // I also tried to use a double tap gesture handler, but it was not working as expected. (Prolly cus of the ScrollView)
                     const now = new Date().getTime();
                     const timeDiff = now - lastPressed;
                     setLastPressed(now);
