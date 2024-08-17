@@ -1,1 +1,1 @@
-export * from './location.model'
+export * from './destination.model'

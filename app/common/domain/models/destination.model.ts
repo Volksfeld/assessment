@@ -1,4 +1,4 @@
-export interface LocationModel {
+export interface DestinationModel {
     key: string,
     location: string,
     numberOfDays: number,
