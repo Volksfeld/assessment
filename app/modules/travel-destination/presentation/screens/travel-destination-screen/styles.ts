@@ -1,9 +1,20 @@
 import { StyleSheet } from "react-native";
+import Constants from "expo-constants";
 
 const styles = StyleSheet.create({
     container: {
       flex: 4,
       backgroundColor: "white",
+    },
+    backButton: {
+      position: "absolute",
+      justifyContent: "center",
+      alignItems: "center",
+      height: 40,
+      width: 40,
+      zIndex: 2,
+      left: 20,
+      top: Constants.statusBarHeight + 20,
     },
     imageContainer: {
       width: "100%",

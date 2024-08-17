@@ -8,9 +8,12 @@ import {
   NativeScrollEvent,
   ActivityIndicator,
   Image,
-  Dimensions
+  Dimensions,
+  TouchableOpacity
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
+import { router } from "expo-router";
+import Icons from '@expo/vector-icons/EvilIcons';
 
 import { GetTravelDestinationById } from "@/lib/data";
 import { DestinationModel } from "@/app/common/domain/models";
@@ -86,6 +89,9 @@ const TravelDestinationScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity style={styles.backButton} onPress={router.back}>
+        <Icons name="chevron-left" size={48} color={destination?.color}/>
+      </TouchableOpacity>
       <MotiView
         animate={{
           flex: snapState,
