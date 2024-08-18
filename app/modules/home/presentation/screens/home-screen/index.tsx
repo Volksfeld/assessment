@@ -22,7 +22,7 @@ import { ItemType } from "./types";
 import { DestinationModel } from "@/app/common/domain/models";
 
 import styles from "./styles";
-
+import { useQuery } from "@tanstack/react-query";
 
 const { width } = Dimensions.get("window");
 
@@ -34,6 +34,8 @@ const HomeScreen: React.FC = () => {
 
   const [lastPressed, setLastPressed] = React.useState(0);
 
+  // The way I'm used to doing thigs is to have a loading state, an error state, and a data state.
+  // React Query Implementation also follows!
   const [loading, setLoading] = React.useState(true);
 
   const [travelDestinations, setTravelDestinations] = React.useState<
@@ -42,24 +44,39 @@ const HomeScreen: React.FC = () => {
 
   const [error, setError] = React.useState<string | null>(null);
 
-  React.useEffect(() => {
-    async function getTravelDestinations() {
-      setLoading(true);
-      const travelDestinations = await getFeaturedTravelDestinations(width);
+  const getTravelDestinations = React.useCallback(async () => {
+    setLoading(true);
+    setError('');
 
-      // As defined in the rules, we shouldn't override getFeaturedTravelDestinations, so error handling
-      // is a dummy implementation here. In a real-world scenario, we would handle this differently.
-      // This function would be a callback to a error state, allowing users to retry, or a toast message.
-      //   if (travelDestinations.error) {
-      //     setError(travelDestinations.error);
-      //   }
+    const travelDestinations = await getFeaturedTravelDestinations(width);
 
-      setTravelDestinations(travelDestinations);
-      setLoading(false);
+    // As defined in the rules, we shouldn't override getFeaturedTravelDestinations, so error handling
+    // is a dummy implementation here. In a real-world scenario, we would handle this differently.
+    // This function would be a callback to a error state, allowing users to retry, or a toast message.
+    // To test it set the following conditional to true hehehe
+    if (!travelDestinations) {
+      setError("Oh no!");
     }
 
+    setTravelDestinations(travelDestinations);
+    setLoading(false);
+  }, []);
+
+  React.useEffect(() => {
     getTravelDestinations();
   }, []);
+
+
+  // Using query only because it was fun to learn and I didin't know about it until now.
+  // Still trying to figure out how to handle the error state with it (i.e bind it to a callback and invoke on button retry. Prolly asigning it to useCallback and etc.)
+  const {
+    data: queryTravelDestinations,
+    error: queryError,
+    isLoading: queryLoading,
+  } = useQuery({
+    queryKey: ["featuredTravelDestinations for", width],
+    queryFn: () => getFeaturedTravelDestinations(width),
+  });
 
   if (loading) {
     return (
@@ -71,14 +88,19 @@ const HomeScreen: React.FC = () => {
 
   if (error) {
     return (
-      <View>
+      <View style={styles.container}>
         <Text>{error}</Text>
+        <TouchableOpacity onPress={getTravelDestinations}>
+          <Text>Very ugly Retry btn</Text>
+        </TouchableOpacity>
       </View>
     );
   }
 
   const travelDestinationsLastIndex = travelDestinations.length - 1;
 
+  // To avoid inline styling, I'm used to StyledComponents. It's really straightforward and easy to use.
+  // I still cant figure out a way to do it with Animations. What would be the best way?
   function SelectedItem({ item }: ItemType) {
     return (
       <Animated.View style={styles.selectedItem}>
@@ -98,6 +120,20 @@ const HomeScreen: React.FC = () => {
         </Animated.Text>
       </Animated.View>
     );
+  }
+
+  function navigateToTravelDestination(index: number) {
+    const id = travelDestinations[index].key;
+
+    router.navigate(
+      `/modules/travel-destination/presentation/screens/travel-destination-screen?id=${id}`,
+    );
+  }
+
+  function handlePressOnSelected(index: number) {
+    selectedItem === index
+      ? navigateToTravelDestination(index)
+      : setSelectedItem(index);
   }
 
   return (
@@ -125,23 +161,21 @@ const HomeScreen: React.FC = () => {
                 style={{
                   borderRadius: 24,
                   overflow: "hidden",
-                  marginRight:
-                    index === travelDestinationsLastIndex ? 0 : 12,
+                  marginRight: index === travelDestinationsLastIndex ? 0 : 12,
                 }}
               >
                 <TouchableOpacity
                   style={styles.destinationButton}
                   onPress={() => {
                     // Thinking about "3. When you double tap a card, the user should be taken to a screen where the card picture is shown along with some more details (lorem ipsum)".
-                    // Should I have considered that a double tap is when you click on a "selected item" or not?
-                    // If so, could have checked if selectedItem === index and then navigate to the screen. Would be easier and beatiful, but I felt like complicating things.
-                    // I also tried to use a double tap gesture handler, but it was not working as expected. (Prolly cus of the ScrollView)
+                    // I implemented both ways: If user taps on a selected item OR if he double taps a location.
+                    // It works for both cases but I dislike the "double tap" implementation. It's kind of hacky. Could be more elegant.
                     const now = new Date().getTime();
                     const timeDiff = now - lastPressed;
                     setLastPressed(now);
-                    timeDiff < 300                    
-                      ? router.navigate(`/modules/travel-destination/presentation/screens/travel-destination-screen?id=${travelDestinations[index].key}`)
-                      : setSelectedItem(index);
+                    timeDiff < 300
+                      ? navigateToTravelDestination(index)
+                      : handlePressOnSelected(index);
                   }}
                 >
                   <Image
@@ -151,9 +185,7 @@ const HomeScreen: React.FC = () => {
                       { resizeMode: "cover" },
                     ]}
                   />
-                  <Animated.View
-                    style={styles.animatedRow}
-                  >
+                  <Animated.View style={styles.animatedRow}>
                     <MotiView
                       animate={{
                         backgroundColor:
@@ -175,8 +207,6 @@ const HomeScreen: React.FC = () => {
       </View>
     </View>
   );
-}
-
-
+};
 
 export default HomeScreen;
