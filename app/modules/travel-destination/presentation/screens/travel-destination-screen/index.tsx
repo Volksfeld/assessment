@@ -9,11 +9,11 @@ import {
   ActivityIndicator,
   Image,
   Dimensions,
-  TouchableOpacity
+  TouchableOpacity,
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { router } from "expo-router";
-import Icons from '@expo/vector-icons/EvilIcons';
+import Icons from "@expo/vector-icons/EvilIcons";
 
 import { GetTravelDestinationById } from "@/lib/data";
 import { DestinationModel } from "@/app/common/domain/models";
@@ -31,31 +31,28 @@ const TravelDestinationScreen: React.FC = () => {
 
   const [error, setError] = React.useState<string | null>(null);
 
-  const [destination, setDestination] = React.useState<
-  DestinationModel
-  >();
+  const [destination, setDestination] = React.useState<DestinationModel>();
 
   const [snapState, setSnapState] = React.useState(3);
 
-  React.useEffect(() => {
-    async function getDestination() {
-      setLoading(true);
-      const destination = await GetTravelDestinationById(
-        width,
-        Number(id),
-      );
+  const getDestination = React.useCallback(async () => {
+    setLoading(true);
+    setError("");
 
-      // As defined in the rules, we shouldn't override getFeaturedTravelDestinations, so error handling
-      // is a dummy implementation here. In a real-world scenario, we would handle this differently.
-      // This function would be a callback to a error state, allowing users to retry, or a toast message.
-      // if (destination.error) {
-      //   setError(destination.error);
-      // }
+    const destination = await GetTravelDestinationById(width, Number(id));
 
-      setDestination(destination);
-      setLoading(false);
+    // As defined in the rules, we shouldn't override getFeaturedTravelDestinations, so error handling
+    // is a dummy implementation here. In a real-world scenario, we would handle this differently.
+    // This function would be a callback to a error state, allowing users to retry, or a toast message.
+    if (!destination) {
+      setError("Oh no! (again?)");
     }
 
+    setDestination(destination);
+    setLoading(false);
+  }, []);
+
+  React.useEffect(() => {
     getDestination();
   }, []);
 
@@ -69,15 +66,18 @@ const TravelDestinationScreen: React.FC = () => {
 
   if (error) {
     return (
-      <View>
+      <View style={styles.container}>
         <Text>{error}</Text>
+        <TouchableOpacity onPress={getDestination}>
+          <Text>Another ugly Retry btn? Damn</Text>
+        </TouchableOpacity>
       </View>
     );
   }
 
   const handleScrollEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const position = event.nativeEvent.contentOffset.y;
-    const hasScrolled = position > 50
+    const hasScrolled = position > 50;
     setSnapState(hasScrolled ? _smallerPortionFlex : _largerPortionFlex);
   };
 
@@ -90,7 +90,7 @@ const TravelDestinationScreen: React.FC = () => {
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.backButton} onPress={router.back}>
-        <Icons name="chevron-left" size={48} color={destination?.color}/>
+        <Icons name="chevron-left" size={48} color={destination?.color} />
       </TouchableOpacity>
       <MotiView
         animate={{
@@ -112,7 +112,7 @@ const TravelDestinationScreen: React.FC = () => {
           type: "timing",
           duration: 300,
         }}
-        style={{...styles.content, backgroundColor: destination?.color}}
+        style={{ ...styles.content, backgroundColor: destination?.color }}
       >
         <ScrollView
           onScrollEndDrag={handleScrollEnd}
@@ -130,7 +130,5 @@ const TravelDestinationScreen: React.FC = () => {
     </View>
   );
 };
-
-
 
 export default TravelDestinationScreen;
