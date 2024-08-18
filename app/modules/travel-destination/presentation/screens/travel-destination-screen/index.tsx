@@ -40,10 +40,6 @@ const TravelDestinationScreen: React.FC = () => {
     setError("");
 
     const destination = await GetTravelDestinationById(width, Number(id));
-
-    // As defined in the rules, we shouldn't override getFeaturedTravelDestinations, so error handling
-    // is a dummy implementation here. In a real-world scenario, we would handle this differently.
-    // This function would be a callback to a error state, allowing users to retry, or a toast message.
     if (!destination) {
       setError("Oh no! (again?)");
     }
